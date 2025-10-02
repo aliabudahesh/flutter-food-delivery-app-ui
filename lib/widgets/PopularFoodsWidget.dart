@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/animation/RotationRoute.dart';
-import 'package:flutter_app/animation/ScaleRoute.dart';
-import 'package:flutter_app/pages/FoodDetailsPage.dart';
+import 'package:flutter_app/config/app_config.dart';
+import 'package:flutter_app/data/sample_data.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 
-class PopularFoodsWidget extends StatefulWidget {
-  @override
-  _PopularFoodsWidgetState createState() => _PopularFoodsWidgetState();
-}
+class PopularFoodsWidget extends StatelessWidget {
+  const PopularFoodsWidget({Key key, this.items, this.onTap}) : super(key: key);
 
-class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
+  final List<RecommendedItem> items;
+  final ValueChanged<RecommendedItem> onTap;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -16,9 +16,28 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
       width: double.infinity,
       child: Column(
         children: <Widget>[
-          PopularFoodTitle(),
+          const PopularFoodTitle(),
           Expanded(
-            child: PopularFoodItems(),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: items?.length ?? 0,
+              itemBuilder: (BuildContext context, int index) {
+                final RecommendedItem item = items[index];
+                return PopularFoodTile(
+                  title: AppLocalizations.of(context).translate(item.titleKey),
+                  subtitle:
+                      AppLocalizations.of(context).translate(item.subtitleKey),
+                  price: item.price,
+                  duration: item.duration,
+                  imageAsset: item.imageAsset,
+                  onTap: () {
+                    if (onTap != null) {
+                      onTap(item);
+                    }
+                  },
+                );
+              },
+            ),
           )
         ],
       ),
@@ -26,46 +45,72 @@ class _PopularFoodsWidgetState extends State<PopularFoodsWidget> {
   }
 }
 
-class PopularFoodTiles extends StatelessWidget {
-  String name;
-  String imageUrl;
-  String rating;
-  String numberOfRating;
-  String price;
-  String slug;
-
-  PopularFoodTiles(
-      {Key key,
-      @required this.name,
-      @required this.imageUrl,
-      @required this.rating,
-      @required this.numberOfRating,
-      @required this.price,
-      @required this.slug})
-      : super(key: key);
+class PopularFoodTitle extends StatelessWidget {
+  const PopularFoodTitle({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
+    final String titleKey = AppConfig.isBookingMode
+        ? 'home.section.recommended.booking'
+        : 'home.section.recommended.food';
+    return Container(
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Text(
+            localizations.translate(titleKey),
+            style: const TextStyle(
+                fontSize: 20,
+                color: Color(0xFF3a3a3b),
+                fontWeight: FontWeight.w300),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PopularFoodTile extends StatelessWidget {
+  const PopularFoodTile({
+    Key key,
+    this.title,
+    this.subtitle,
+    this.price,
+    this.duration,
+    this.imageAsset,
+    this.onTap,
+  }) : super(key: key);
+
+  final String title;
+  final String subtitle;
+  final double price;
+  final int duration;
+  final String imageAsset;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations localizations = AppLocalizations.of(context);
     return InkWell(
-      onTap: () {
-        Navigator.push(context, ScaleRoute(page: FoodDetailsPage()));
-      },
+      onTap: onTap,
       child: Column(
         children: <Widget>[
           Container(
-            padding: EdgeInsets.only(left: 10, right: 5, top: 5, bottom: 5),
-            decoration: BoxDecoration(boxShadow: [
-              /* BoxShadow(
+            padding: const EdgeInsets.only(left: 10, right: 5, top: 5, bottom: 5),
+            decoration: const BoxDecoration(boxShadow: [
+              BoxShadow(
                 color: Color(0xFFfae3e2),
                 blurRadius: 15.0,
                 offset: Offset(0, 0.75),
-              ),*/
+              ),
             ]),
             child: Card(
                 color: Colors.white,
                 elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: const BorderRadius.all(
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(
                     Radius.circular(5.0),
                   ),
                 ),
@@ -81,21 +126,21 @@ class PopularFoodTiles extends StatelessWidget {
                             child: Container(
                               alignment: Alignment.topRight,
                               width: double.infinity,
-                              padding: EdgeInsets.only(right: 5, top: 5),
+                              padding: const EdgeInsets.only(right: 5, top: 5),
                               child: Container(
                                 height: 28,
                                 width: 28,
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: Colors.white70,
-                                    boxShadow: [
+                                    boxShadow: const <BoxShadow>[
                                       BoxShadow(
                                         color: Color(0xFFfae3e2),
                                         blurRadius: 25.0,
                                         offset: Offset(0.0, 0.75),
                                       ),
                                     ]),
-                                child: Icon(
+                                child: const Icon(
                                   Icons.favorite,
                                   color: Color(0xFFfb3132),
                                   size: 16,
@@ -107,11 +152,10 @@ class PopularFoodTiles extends StatelessWidget {
                             alignment: Alignment.centerLeft,
                             child: Center(
                                 child: Image.asset(
-                              'assets/images/popular_foods/' +
-                                  imageUrl +
-                                  ".png",
+                              imageAsset,
                               width: 130,
                               height: 140,
+                              fit: BoxFit.cover,
                             )),
                           )
                         ],
@@ -121,23 +165,23 @@ class PopularFoodTiles extends StatelessWidget {
                         children: <Widget>[
                           Container(
                             alignment: Alignment.bottomLeft,
-                            padding: EdgeInsets.only(left: 5, top: 5),
-                            child: Text(name,
-                                style: TextStyle(
+                            padding: const EdgeInsets.only(left: 5, top: 5),
+                            child: Text(title ?? '',
+                                style: const TextStyle(
                                     color: Color(0xFF6e6e71),
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500)),
                           ),
                           Container(
                             alignment: Alignment.topRight,
-                            padding: EdgeInsets.only(right: 5),
+                            padding: const EdgeInsets.only(right: 5),
                             child: Container(
                               height: 28,
                               width: 28,
                               decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: Colors.white70,
-                                  boxShadow: [
+                                  boxShadow: const <BoxShadow>[
                                     BoxShadow(
                                       color: Color(0xFFfae3e2),
                                       blurRadius: 25.0,
@@ -145,8 +189,10 @@ class PopularFoodTiles extends StatelessWidget {
                                     ),
                                   ]),
                               child: Icon(
-                                Icons.near_me,
-                                color: Color(0xFFfb3132),
+                                AppConfig.isBookingMode
+                                    ? Icons.schedule
+                                    : Icons.near_me,
+                                color: const Color(0xFFfb3132),
                                 size: 16,
                               ),
                             ),
@@ -156,72 +202,46 @@ class PopularFoodTiles extends StatelessWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Container(
-                                alignment: Alignment.topLeft,
-                                padding: EdgeInsets.only(left: 5, top: 5),
-                                child: Text(rating,
-                                    style: TextStyle(
-                                        color: Color(0xFF6e6e71),
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w400)),
-                              ),
-                              Container(
-                                padding: EdgeInsets.only(top: 3, left: 5),
-                                child: Row(
-                                  children: <Widget>[
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFFfb3132),
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFFfb3132),
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFFfb3132),
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFFfb3132),
-                                    ),
-                                    Icon(
-                                      Icons.star,
-                                      size: 10,
-                                      color: Color(0xFF9b9b9c),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.topLeft,
-                                padding: EdgeInsets.only(left: 5, top: 5),
-                                child: Text("($numberOfRating)",
-                                    style: TextStyle(
-                                        color: Color(0xFF6e6e71),
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w400)),
-                              ),
-                            ],
+                          Container(
+                            alignment: Alignment.topLeft,
+                            padding: const EdgeInsets.only(left: 5, top: 5),
+                            child: Text(
+                              subtitle ?? '',
+                              style: const TextStyle(
+                                  color: Color(0xFF6e6e71),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w400),
+                            ),
                           ),
                           Container(
-                            alignment: Alignment.bottomLeft,
-                            padding: EdgeInsets.only(left: 5, top: 5, right: 5),
-                            child: Text('\$' + price,
-                                style: TextStyle(
-                                    color: Color(0xFF6e6e71),
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600)),
-                          )
+                            alignment: Alignment.topLeft,
+                            padding:
+                                const EdgeInsets.only(left: 5, top: 5, right: 5),
+                            child: Text(
+                              AppConfig.isBookingMode
+                                  ? '${price?.toStringAsFixed(0) ?? '0'} ₪'
+                                  : '\$${price?.toStringAsFixed(2) ?? '0.00'}',
+                              style: const TextStyle(
+                                  color: Color(0xFF6e6e71),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                          ),
                         ],
-                      )
+                      ),
+                      if (AppConfig.isBookingMode)
+                        Container(
+                          alignment: Alignment.topLeft,
+                          padding: const EdgeInsets.only(left: 5, top: 5, right: 5),
+                          child: Text(
+                            localizations.translate('service.duration.minutes',
+                                count: duration ?? AppConfig.slotLengthMinutes),
+                            style: const TextStyle(
+                                color: Color(0xFF6e6e71),
+                                fontSize: 10,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
                     ],
                   ),
                 )),
@@ -231,105 +251,3 @@ class PopularFoodTiles extends StatelessWidget {
     );
   }
 }
-
-class PopularFoodTitle extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Text(
-            "Popluar Foods",
-            style: TextStyle(
-                fontSize: 20,
-                color: Color(0xFF3a3a3b),
-                fontWeight: FontWeight.w300),
-          ),
-          Text(
-            "See all",
-            style: TextStyle(
-                fontSize: 16, color: Colors.blue, fontWeight: FontWeight.w100),
-          )
-        ],
-      ),
-    );
-  }
-}
-
-class PopularFoodItems extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.horizontal,
-      children: <Widget>[
-        PopularFoodTiles(
-            name: "Fried Egg",
-            imageUrl: "ic_popular_food_1",
-            rating: '4.9',
-            numberOfRating: '200',
-            price: '15.06',
-            slug: "fried_egg"),
-        PopularFoodTiles(
-            name: "Mixed Vegetable",
-            imageUrl: "ic_popular_food_3",
-            rating: "4.9",
-            numberOfRating: "100",
-            price: "17.03",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Salad With Chicken",
-            imageUrl: "ic_popular_food_4",
-            rating: "4.0",
-            numberOfRating: "50",
-            price: "11.00",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Mixed Salad",
-            imageUrl: "ic_popular_food_5",
-            rating: "4.00",
-            numberOfRating: "100",
-            price: "11.10",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Red meat,Salad",
-            imageUrl: "ic_popular_food_2",
-            rating: "4.6",
-            numberOfRating: "150",
-            price: "12.00",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Mixed Salad",
-            imageUrl: "ic_popular_food_5",
-            rating: "4.00",
-            numberOfRating: "100",
-            price: "11.10",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Potato,Meat fry",
-            imageUrl: "ic_popular_food_6",
-            rating: "4.2",
-            numberOfRating: "70",
-            price: "23.0",
-            slug: ""),
-        PopularFoodTiles(
-            name: "Fried Egg",
-            imageUrl: "ic_popular_food_1",
-            rating: '4.9',
-            numberOfRating: '200',
-            price: '15.06',
-            slug: "fried_egg"),
-        PopularFoodTiles(
-            name: "Red meat,Salad",
-            imageUrl: "ic_popular_food_2",
-            rating: "4.6",
-            numberOfRating: "150",
-            price: "12.00",
-            slug: ""),
-      ],
-    );
-  }
-}
-
-
