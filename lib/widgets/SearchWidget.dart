@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 class SearchWidget extends StatelessWidget {
+  const SearchWidget({Key key, this.hintText}) : super(key: key);
+
+  final String hintText;
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -24,7 +28,7 @@ class SearchWidget extends StatelessWidget {
           fillColor: Color(0xFFFAFAFA),
           suffixIcon: Icon(Icons.sort,color: Color(0xFFfb3132),),
           hintStyle: new TextStyle(color: Color(0xFFd0cece), fontSize: 18),
-          hintText: "What would your like to buy?",
+          hintText: hintText ?? "",
         ),
       ),
     );

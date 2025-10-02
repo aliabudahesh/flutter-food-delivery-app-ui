@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/config/app_config.dart';
+import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BottomNavBarWidget extends StatefulWidget {
@@ -17,35 +19,40 @@ class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
       });
     }
 
+    final AppLocalizations localizations = AppLocalizations.of(context);
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
-      items: const <BottomNavigationBarItem>[
+      items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: const Icon(Icons.home),
           title: Text(
-            'Home',
-            style: TextStyle(color: Color(0xFF2c2b2b)),
+            AppConfig.isBookingMode
+                ? localizations.translate('app.title.booking')
+                : localizations.translate('app.title.food'),
+            style: const TextStyle(color: Color(0xFF2c2b2b)),
           ),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.near_me),
+          icon: const Icon(Icons.near_me),
           title: Text(
-            'Near By',
-            style: TextStyle(color: Color(0xFF2c2b2b)),
+            localizations.translate('home.menu.nearby'),
+            style: const TextStyle(color: Color(0xFF2c2b2b)),
           ),
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.card_giftcard),
+          icon: const Icon(Icons.event_note),
           title: Text(
-            'Cart',
-            style: TextStyle(color: Color(0xFF2c2b2b)),
+            AppConfig.isBookingMode
+                ? localizations.translate('home.menu.summary')
+                : localizations.translate('cart.title'),
+            style: const TextStyle(color: Color(0xFF2c2b2b)),
           ),
         ),
         BottomNavigationBarItem(
-          icon: Icon(FontAwesomeIcons.user),
+          icon: const Icon(FontAwesomeIcons.user),
           title: Text(
-            'Account',
-            style: TextStyle(color: Color(0xFF2c2b2b)),
+            localizations.translate('home.menu.account'),
+            style: const TextStyle(color: Color(0xFF2c2b2b)),
           ),
         ),
       ],
