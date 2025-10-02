@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_app/animation/ScaleRoute.dart';
 import 'package:flutter_app/pages/FoodDetailsPage.dart';
 import 'package:flutter_app/pages/SignUpPage.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignInPage extends StatefulWidget {
+  const SignInPage({super.key});
+
   @override
-  _SignInPageState createState() => _SignInPageState();
+  State<SignInPage> createState() => _SignInPageState();
 }
 
 class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
-    String defaultFontFamily = 'Roboto-Light.ttf';
-    double defaultFontSize = 14;
-    double defaultIconSize = 17;
+    const String defaultFontFamily = 'Roboto-Light.ttf';
+    const double defaultFontSize = 14;
+    const double defaultIconSize = 17;
 
     return Scaffold(
       body: Container(
-        padding: EdgeInsets.only(left: 20, right: 20, top: 35, bottom: 30),
+        padding: const EdgeInsets.only(left: 20, right: 20, top: 35, bottom: 30),
         width: double.infinity,
         height: double.infinity,
         color: Colors.white70,
@@ -28,11 +29,9 @@ class _SignInPageState extends State<SignInPage> {
             Flexible(
               flex: 1,
               child: InkWell(
-                child: Container(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Icon(Icons.close),
-                  ),
+                child: const Align(
+                  alignment: Alignment.topLeft,
+                  child: Icon(Icons.close),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -48,13 +47,9 @@ class _SignInPageState extends State<SignInPage> {
                     width: 230,
                     height: 100,
                     alignment: Alignment.center,
-                    child: Image.asset(
-                      "assets/images/menus/ic_food_express.png",
-                    ),
+                    child: Image.asset('assets/images/menus/ic_food_express.png'),
                   ),
-                  SizedBox(
-                    height: 15,
-                  ),
+                  const SizedBox(height: 15),
                   TextField(
                     showCursor: true,
                     decoration: InputDecoration(
@@ -73,15 +68,11 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       fillColor: Color(0xFFF2F3F5),
                       hintStyle: TextStyle(
-                          color: Color(0xFF666666),
-                          fontFamily: defaultFontFamily,
-                          fontSize: defaultFontSize),
-                      hintText: "Phone Number",
+                          color: Color(0xFF666666), fontFamily: defaultFontFamily, fontSize: defaultFontSize),
+                      hintText: 'Phone Number',
                     ),
                   ),
-                  SizedBox(
-                    height: 15,
-                  ),
+                  const SizedBox(height: 15),
                   TextField(
                     showCursor: true,
                     decoration: InputDecoration(
@@ -109,17 +100,15 @@ class _SignInPageState extends State<SignInPage> {
                         fontFamily: defaultFontFamily,
                         fontSize: defaultFontSize,
                       ),
-                      hintText: "Password",
+                      hintText: 'Password',
                     ),
                   ),
+                  const SizedBox(height: 15),
                   SizedBox(
-                    height: 15,
-                  ),
-                  Container(
                     width: double.infinity,
                     child: Text(
-                      "Forgot your password?",
-                      style: TextStyle(
+                      'Forgot your password?',
+                      style: const TextStyle(
                         color: Color(0xFF666666),
                         fontFamily: defaultFontFamily,
                         fontSize: defaultFontSize,
@@ -128,14 +117,10 @@ class _SignInPageState extends State<SignInPage> {
                       textAlign: TextAlign.end,
                     ),
                   ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  SignInButtonWidget(),
-                  SizedBox(
-                    height: 2,
-                  ),
-                  FacebookGoogleLogin()
+                  const SizedBox(height: 15),
+                  const SignInButtonWidget(),
+                  const SizedBox(height: 2),
+                  const FacebookGoogleLogin()
                 ],
               ),
             ),
@@ -147,30 +132,26 @@ class _SignInPageState extends State<SignInPage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    Container(
-                      child: Text(
-                        "Don't have an account? ",
-                        style: TextStyle(
-                          color: Color(0xFF666666),
-                          fontFamily: defaultFontFamily,
-                          fontSize: defaultFontSize,
-                          fontStyle: FontStyle.normal,
-                        ),
+                    const Text(
+                      "Don't have an account? ",
+                      style: TextStyle(
+                        color: Color(0xFF666666),
+                        fontFamily: defaultFontFamily,
+                        fontSize: defaultFontSize,
+                        fontStyle: FontStyle.normal,
                       ),
                     ),
                     InkWell(
-                      onTap: () => {
-                      Navigator.push(context, ScaleRoute(page: SignUpPage()))
+                      onTap: () {
+                        Navigator.push(context, ScaleRoute(page: const SignUpPage()));
                       },
-                      child: Container(
-                        child: Text(
-                          "Sign Up",
-                          style: TextStyle(
-                            color: Color(0xFFf7418c),
-                            fontFamily: defaultFontFamily,
-                            fontSize: defaultFontSize,
-                            fontStyle: FontStyle.normal,
-                          ),
+                      child: const Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          color: Color(0xFFf7418c),
+                          fontFamily: defaultFontFamily,
+                          fontSize: defaultFontSize,
+                          fontStyle: FontStyle.normal,
                         ),
                       ),
                     ),
@@ -186,11 +167,13 @@ class _SignInPageState extends State<SignInPage> {
 }
 
 class SignInButtonWidget extends StatelessWidget {
+  const SignInButtonWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: new BoxDecoration(
+      decoration: const BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(5.0)),
         boxShadow: <BoxShadow>[
           BoxShadow(
@@ -200,11 +183,11 @@ class SignInButtonWidget extends StatelessWidget {
             color: Color(0xFFf7418c),
           ),
         ],
-        gradient: new LinearGradient(
-            colors: [Color(0xFFf7418c), Color(0xFFfbab66)],
+        gradient: const LinearGradient(
+            colors: <Color>[Color(0xFFf7418c), Color(0xFFfbab66)],
             begin: const FractionalOffset(0.2, 0.2),
             end: const FractionalOffset(1.0, 1.0),
-            stops: [0.0, 1.0],
+            stops: <double>[0.0, 1.0],
             tileMode: TileMode.clamp),
       ),
       child: MaterialButton(
@@ -215,64 +198,66 @@ class SignInButtonWidget extends StatelessWidget {
             padding:
                 const EdgeInsets.symmetric(vertical: 10.0, horizontal: 42.0),
             child: Text(
-              "SIGN IN",
-              style: TextStyle(
+              'SIGN IN',
+              style: const TextStyle(
                   color: Colors.white,
                   fontSize: 25.0,
-                  fontFamily: "WorkSansBold"),
+                  fontFamily: 'WorkSansBold'),
             ),
           ),
-          onPressed: () => {}),
+          onPressed: () {}),
     );
   }
 }
 
 class FacebookGoogleLogin extends StatelessWidget {
+  const FacebookGoogleLogin({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
         child: Column(
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: 10.0),
+          padding: const EdgeInsets.only(top: 10.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
                 decoration: BoxDecoration(
-                  gradient: new LinearGradient(
-                      colors: [
+                  gradient: const LinearGradient(
+                      colors: <Color>[
                         Colors.black12,
                         Colors.black54,
                       ],
                       begin: const FractionalOffset(0.0, 0.0),
                       end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
+                      stops: <double>[0.0, 1.0],
                       tileMode: TileMode.clamp),
                 ),
                 width: 100.0,
                 height: 1.0,
               ),
               Padding(
-                padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                padding: const EdgeInsets.only(left: 15.0, right: 15.0),
                 child: Text(
-                  "Or",
-                  style: TextStyle(
+                  'Or',
+                  style: const TextStyle(
                       color: Color(0xFF2c2b2b),
                       fontSize: 16.0,
-                      fontFamily: "WorkSansMedium"),
+                      fontFamily: 'WorkSansMedium'),
                 ),
               ),
               Container(
                 decoration: BoxDecoration(
-                  gradient: new LinearGradient(
-                      colors: [
+                  gradient: const LinearGradient(
+                      colors: <Color>[
                         Colors.black54,
                         Colors.black12,
                       ],
                       begin: const FractionalOffset(0.0, 0.0),
                       end: const FractionalOffset(1.0, 1.0),
-                      stops: [0.0, 1.0],
+                      stops: <double>[0.0, 1.0],
                       tileMode: TileMode.clamp),
                 ),
                 width: 100.0,
@@ -285,16 +270,16 @@ class FacebookGoogleLogin extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.only(top: 10.0, right: 40.0),
+              padding: const EdgeInsets.only(top: 10.0, right: 40.0),
               child: GestureDetector(
                 onTap: () {},
                 child: Container(
                   padding: const EdgeInsets.all(15.0),
-                  decoration: new BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0xFFf7418c),
                   ),
-                  child: Icon(
+                  child: const Icon(
                     FontAwesomeIcons.facebookF,
                     color: Color(0xFFFFFFFF),
                   ),
@@ -302,16 +287,16 @@ class FacebookGoogleLogin extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(top: 10.0),
+              padding: const EdgeInsets.only(top: 10.0),
               child: GestureDetector(
                 onTap: () => {},
                 child: Container(
                   padding: const EdgeInsets.all(15.0),
-                  decoration: new BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0xFFf7418c),
                   ),
-                  child: new Icon(
+                  child: const Icon(
                     FontAwesomeIcons.google,
                     color: Color(0xFFFFFFFF),
                   ),

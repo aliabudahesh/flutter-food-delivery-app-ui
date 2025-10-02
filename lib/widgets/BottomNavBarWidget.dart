@@ -4,61 +4,51 @@ import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class BottomNavBarWidget extends StatefulWidget {
+  const BottomNavBarWidget({super.key});
+
   @override
-  _BottomNavBarWidgetState createState() => _BottomNavBarWidgetState();
+  State<BottomNavBarWidget> createState() => _BottomNavBarWidgetState();
 }
 
 class _BottomNavBarWidgetState extends State<BottomNavBarWidget> {
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    int _selectedIndex = 0;
-    void _onItemTapped(int index) {
-      setState(() {
-        _selectedIndex = index;
-//        navigateToScreens(index);
-      });
-    }
-
-    final AppLocalizations localizations = AppLocalizations.of(context);
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
+      currentIndex: _selectedIndex,
+      selectedItemColor: const Color(0xFFfd5352),
+      onTap: _onItemTapped,
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: const Icon(Icons.home),
-          title: Text(
-            AppConfig.isBookingMode
-                ? localizations.translate('app.title.booking')
-                : localizations.translate('app.title.food'),
-            style: const TextStyle(color: Color(0xFF2c2b2b)),
-          ),
+          label: AppConfig.isBookingMode
+              ? localizations.translate('app.title.booking')
+              : localizations.translate('app.title.food'),
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.near_me),
-          title: Text(
-            localizations.translate('home.menu.nearby'),
-            style: const TextStyle(color: Color(0xFF2c2b2b)),
-          ),
+          label: localizations.translate('home.menu.nearby'),
         ),
         BottomNavigationBarItem(
           icon: const Icon(Icons.event_note),
-          title: Text(
-            AppConfig.isBookingMode
-                ? localizations.translate('home.menu.summary')
-                : localizations.translate('cart.title'),
-            style: const TextStyle(color: Color(0xFF2c2b2b)),
-          ),
+          label: AppConfig.isBookingMode
+              ? localizations.translate('home.menu.summary')
+              : localizations.translate('cart.title'),
         ),
         BottomNavigationBarItem(
           icon: const Icon(FontAwesomeIcons.user),
-          title: Text(
-            localizations.translate('home.menu.account'),
-            style: const TextStyle(color: Color(0xFF2c2b2b)),
-          ),
+          label: localizations.translate('home.menu.account'),
         ),
       ],
-      currentIndex: _selectedIndex,
-      selectedItemColor: Color(0xFFfd5352),
-      onTap: _onItemTapped,
     );
   }
 }

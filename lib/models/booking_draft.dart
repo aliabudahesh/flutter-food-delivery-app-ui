@@ -12,10 +12,10 @@ class BookingDraft {
     this.notes,
   });
 
-  final Business business;
-  final BusinessLocation branch;
-  final Service service;
-  final StaffMember staff;
-  final DateTime start;
-  final String notes;
+  final Business? business;
+  final BusinessLocation? branch;
+  final Service? service;
+  final StaffMember? staff;
+  final DateTime? start;
+  final String? notes;
 }

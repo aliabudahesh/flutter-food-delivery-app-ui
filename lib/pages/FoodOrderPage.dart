@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_app/config/app_config.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:flutter_app/models/booking_draft.dart';
+import 'package:flutter_app/models/business.dart';
+import 'package:flutter_app/models/service.dart';
+import 'package:flutter_app/models/staff.dart';
 import 'package:flutter_app/repositories/booking_repository.dart';
 
 class FoodOrderPage extends StatefulWidget {
-  const FoodOrderPage({Key key, this.bookingDraft}) : super(key: key);
+  const FoodOrderPage({super.key, this.bookingDraft});
 
-  final BookingDraft bookingDraft;
+  final BookingDraft? bookingDraft;
 
   @override
-  _FoodOrderPageState createState() => _FoodOrderPageState();
+  State<FoodOrderPage> createState() => _FoodOrderPageState();
 }
 
 class _FoodOrderPageState extends State<FoodOrderPage> {
@@ -24,8 +26,12 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
       return _buildLegacyCart(context);
     }
 
-    final AppLocalizations localizations = AppLocalizations.of(context);
-    final BookingDraft draft = widget.bookingDraft;
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
+    final BookingDraft draft = widget.bookingDraft!;
+    final Business business = draft.business!;
+    final Service service = draft.service!;
+    final BusinessLocation branch = draft.branch ??
+        (business.locations.isNotEmpty ? business.locations.first : BusinessLocation(id: 'default', name: service.name));
 
     return Scaffold(
       appBar: AppBar(
@@ -46,7 +52,6 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
               fontSize: 18),
           textAlign: TextAlign.center,
         ),
-        brightness: Brightness.light,
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -56,25 +61,25 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
             children: <Widget>[
               _SummaryCard(
                 title: localizations.translate('booking.summary.service'),
-                value: localizations.translate(draft.service.name),
+                value: localizations.translate(service.name),
               ),
               _SummaryCard(
                 title: localizations.translate('booking.summary.branch'),
-                value: localizations.translate(draft.branch.name ?? ''),
-                subtitle: localizations.translate(draft.branch.address ?? ''),
+                value: localizations.translate(branch.name),
+                subtitle: localizations.translate(branch.address ?? ''),
               ),
               if (draft.staff != null)
                 _SummaryCard(
                   title: localizations.translate('booking.summary.staff'),
-                  value: localizations.translate(draft.staff.name ?? ''),
+                  value: localizations.translate(draft.staff!.name),
                 ),
               _SummaryCard(
                 title: localizations.translate('booking.summary.time'),
-                value: _formatDateTime(draft.start, context),
+                value: _formatDateTime(draft.start!, context),
               ),
               _SummaryCard(
                 title: localizations.translate('booking.summary.price'),
-                value: '${draft.service.price.toStringAsFixed(0)} ₪',
+                value: '${service.price.toStringAsFixed(0)} ₪',
               ),
               if (draft.notes?.isNotEmpty == true)
                 _SummaryCard(
@@ -98,7 +103,7 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
                   message: localizations.translate('booking.summary.completed'),
                 ),
               const SizedBox(height: 10),
-              _buildActionButtons(localizations, draft),
+              _buildActionButtons(localizations, draft, business: business, branch: branch, service: service),
             ],
           ),
         ),
@@ -106,7 +111,10 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
     );
   }
 
-  Widget _buildActionButtons(AppLocalizations localizations, BookingDraft draft) {
+  Widget _buildActionButtons(AppLocalizations localizations, BookingDraft draft,
+      {required Business business, required BusinessLocation branch, required Service service}) {
+    final StaffMember? staff = draft.staff;
+    final DateTime start = draft.start!;
     return Column(
       children: <Widget>[
         SizedBox(
@@ -118,17 +126,17 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             onPressed: () {
               _repository.createBooking(
-                business: draft.business,
-                branch: draft.branch,
-                service: draft.service,
-                staff: draft.staff,
-                start: draft.start,
+                business: business,
+                branch: branch,
+                service: service,
+                staff: staff,
+                start: start,
                 notes: draft.notes,
               );
               setState(() {
                 _bookingConfirmed = true;
               });
-              debugPrint('[analytics] booking_confirmed:${draft.service.id}:${draft.start.toIso8601String()}');
+              debugPrint('[analytics] booking_confirmed:${service.id}:${start.toIso8601String()}');
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(
                     localizations.translate('booking.summary.success')),
@@ -157,7 +165,7 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
                       child: SelectableText(ics),
                     ),
                     actions: <Widget>[
-                      FlatButton(
+                      TextButton(
                         onPressed: () => Navigator.of(context).pop(),
                         child: const Text('OK'),
                       ),
@@ -183,9 +191,11 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
   }
 
   String _generateIcsContent(BookingDraft draft) {
-    final DateTime end =
-        draft.start.add(Duration(minutes: draft.service.durationMinutes));
-    return 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${draft.service.name}\nDTSTART:${_formatIcsDate(draft.start)}\nDTEND:${_formatIcsDate(end)}\nLOCATION:${draft.branch.name}\nDESCRIPTION:${draft.notes ?? ''}\nEND:VEVENT\nEND:VCALENDAR';
+    final Service service = draft.service!;
+    final DateTime start = draft.start!;
+    final DateTime end = start.add(Duration(minutes: service.durationMinutes));
+    final String location = draft.branch?.name ?? service.name;
+    return 'BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${service.name}\nDTSTART:${_formatIcsDate(start)}\nDTEND:${_formatIcsDate(end)}\nLOCATION:$location\nDESCRIPTION:${draft.notes ?? ''}\nEND:VEVENT\nEND:VCALENDAR';
   }
 
   String _formatIcsDate(DateTime date) {
@@ -220,7 +230,6 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
               textAlign: TextAlign.center,
             ),
           ),
-          brightness: Brightness.light,
           actions: <Widget>[
             CartIconWithBadge(),
           ],
@@ -292,11 +301,11 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
 }
 
 class _SummaryCard extends StatelessWidget {
-  const _SummaryCard({Key key, this.title, this.value, this.subtitle}) : super(key: key);
+  const _SummaryCard({super.key, this.title, this.value, this.subtitle});
 
-  final String title;
-  final String value;
-  final String subtitle;
+  final String? title;
+  final String? value;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -358,9 +367,9 @@ class _SummaryCard extends StatelessWidget {
 }
 
 class _SuccessBanner extends StatelessWidget {
-  const _SuccessBanner({Key key, this.message}) : super(key: key);
+  const _SuccessBanner({super.key, this.message});
 
-  final String message;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
@@ -604,12 +613,12 @@ class PromoCodeWidget extends StatelessWidget {
 
 class CartItem extends StatefulWidget {
   const CartItem({
-    Key key,
-    this.productName,
-    this.productPrice,
-    this.productImage,
-    this.productCartQuantity,
-  }) : super(key: key);
+    super.key,
+    required this.productName,
+    required this.productPrice,
+    required this.productImage,
+    required this.productCartQuantity,
+  });
 
   final String productName;
   final String productPrice;

@@ -10,25 +10,25 @@ import 'package:flutter_app/pages/FoodOrderPage.dart';
 import 'package:flutter_app/repositories/booking_repository.dart';
 
 class FoodDetailsPage extends StatefulWidget {
-  const FoodDetailsPage({Key key, this.business, this.service}) : super(key: key);
+  const FoodDetailsPage({super.key, this.business, this.service});
 
-  final Business business;
-  final Service service;
+  final Business? business;
+  final Service? service;
 
   @override
-  _FoodDetailsPageState createState() => _FoodDetailsPageState();
+  State<FoodDetailsPage> createState() => _FoodDetailsPageState();
 }
 
 class _FoodDetailsPageState extends State<FoodDetailsPage> {
   final BookingRepository _repository = BookingRepository();
   final TextEditingController _notesController = TextEditingController();
 
-  Business _business;
-  Service _service;
-  BusinessLocation _selectedBranch;
-  StaffMember _selectedStaff;
+  Business? _business;
+  Service? _service;
+  BusinessLocation? _selectedBranch;
+  StaffMember? _selectedStaff;
   DateTime _selectedDate = DateTime.now();
-  DateTime _selectedSlot;
+  DateTime? _selectedSlot;
   List<DateTime> _slots = <DateTime>[];
 
   @override
@@ -42,24 +42,27 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
   void _initializeBookingContext() {
     final List<Business> businesses = _repository.getBusinesses();
     _business = widget.business ?? (businesses.isNotEmpty ? businesses.first : null);
-    if (_business == null) {
+    final Business? business = _business;
+    if (business == null) {
       return;
     }
 
     final List<Service> services =
-        _repository.getServicesForBusiness(_business.id);
+        _repository.getServicesForBusiness(business.id);
     _service = widget.service ?? (services.isNotEmpty ? services.first : null);
     _selectedBranch =
-        _business.locations.isNotEmpty ? _business.locations.first : null;
+        business.locations.isNotEmpty ? business.locations.first : null;
     if (AppConfig.allowStaffSelection) {
-      final List<StaffMember> staff = _repository.getStaffForBusiness(_business.id);
+      final List<StaffMember> staff = _repository.getStaffForBusiness(business.id);
       _selectedStaff = staff.isNotEmpty ? staff.first : null;
     }
     _refreshSlots();
   }
 
   void _refreshSlots() {
-    if (_business == null || _service == null) {
+    final Business? business = _business;
+    final Service? service = _service;
+    if (business == null || service == null) {
       setState(() {
         _slots = <DateTime>[];
         _selectedSlot = null;
@@ -68,9 +71,9 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
     }
     final List<DateTime> generated = _repository.generateSlots(
       forDate: _selectedDate,
-      service: _service,
+      service: service,
       staff: _selectedStaff,
-      business: _business,
+      business: business,
       branch: _selectedBranch,
     );
     setState(() {
@@ -82,7 +85,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
   }
 
   List<StaffMember> get _availableStaff =>
-      _business == null ? <StaffMember>[] : _repository.getStaffForBusiness(_business.id);
+      _business == null ? <StaffMember>[] : _repository.getStaffForBusiness(_business!.id);
 
   @override
   Widget build(BuildContext context) {
@@ -90,11 +93,11 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
       return _buildLegacyFoodDetails(context);
     }
 
-    final AppLocalizations localizations = AppLocalizations.of(context);
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
     final String serviceName =
-        _service != null ? localizations.translate(_service.name) : '';
+        _service != null ? localizations.translate(_service!.name) : '';
     final String businessName = _business != null
-        ? localizations.translate(_business.name ?? '')
+        ? localizations.translate(_business!.name)
         : '';
 
     return Scaffold(
@@ -149,8 +152,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
 
   Widget _buildHeroImage() {
     final String fallback = 'assets/images/bestfood/ic_best_food_8.jpeg';
-    final String imagePath = _business?.photos?.isNotEmpty == true
-        ? _business.photos.first
+    final String imagePath = _business?.photos.isNotEmpty == true
+        ? _business!.photos.first
         : fallback;
     return Card(
       semanticContainer: true,
@@ -169,7 +172,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
 
   Widget _buildDescriptionCard(AppLocalizations localizations) {
     final String description = _service != null
-        ? localizations.translate(_service.description ?? '')
+        ? localizations.translate(_service!.description ?? '')
         : '';
     return Card(
       color: Colors.white,
@@ -204,13 +207,14 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
   }
 
   Widget _buildBranchSelector(AppLocalizations localizations) {
-   final List<BusinessLocation> locations = _business?.locations ?? <BusinessLocation>[];
-    final List<BusinessLocation> filteredLocations = _service?.branches?.isNotEmpty == true
-        ? locations
-            .where((BusinessLocation location) =>
-                _service.branches.contains(location.id))
-            .toList()
-        : locations;
+    final List<BusinessLocation> locations = _business?.locations ?? <BusinessLocation>[];
+    final List<BusinessLocation> filteredLocations =
+        _service != null && _service!.branches.isNotEmpty
+            ? locations
+                .where((BusinessLocation location) =>
+                    _service!.branches.contains(location.id))
+                .toList()
+            : locations;
     if (filteredLocations.isNotEmpty &&
         (_selectedBranch == null ||
             !filteredLocations.contains(_selectedBranch))) {
@@ -227,7 +231,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
         isExpanded: true,
         value: _selectedBranch,
         underline: const SizedBox.shrink(),
-        onChanged: (BusinessLocation value) {
+        onChanged: (BusinessLocation? value) {
           setState(() {
             _selectedBranch = value;
           });
@@ -236,7 +240,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
         items: filteredLocations
             .map((BusinessLocation location) => DropdownMenuItem<BusinessLocation>(
                   value: location,
-                  child: Text(localizations.translate(location.name ?? '')),
+                  child: Text(localizations.translate(location.name)),
                 ))
             .toList(),
       ),
@@ -252,7 +256,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
         isExpanded: true,
         value: _selectedStaff,
         underline: const SizedBox.shrink(),
-        onChanged: (StaffMember value) {
+        onChanged: (StaffMember? value) {
           setState(() {
             _selectedStaff = value;
           });
@@ -261,7 +265,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
         items: staff
             .map((StaffMember member) => DropdownMenuItem<StaffMember>(
                   value: member,
-                  child: Text(localizations.translate(member.name ?? '')),
+                  child: Text(localizations.translate(member.name)),
                 ))
             .toList(),
       ),
@@ -280,7 +284,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
         title: Text(formattedDate),
         trailing: const Icon(Icons.calendar_today, color: Color(0xFFfb3132)),
         onTap: () async {
-          final DateTime picked = await showDatePicker(
+          final DateTime? picked = await showDatePicker(
             context: context,
             initialDate: _selectedDate,
             firstDate: DateTime.now(),
@@ -361,7 +365,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
         color: const Color(0xFFfb3132),
         textColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        onPressed: _selectedSlot == null || _service == null
+        onPressed: _selectedSlot == null || _service == null || _business == null
             ? () {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content:
@@ -369,8 +373,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
                 ));
               }
             : () {
-                debugPrint('[analytics] select_service:${_service.id}');
-                debugPrint('[analytics] select_slot:${_selectedSlot.toIso8601String()}');
+                debugPrint('[analytics] select_service:${_service!.id}');
+                debugPrint('[analytics] select_slot:${_selectedSlot!.toIso8601String()}');
                 final BookingDraft draft = BookingDraft(
                   business: _business,
                   branch: _selectedBranch,
@@ -408,7 +412,6 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
             ),
             onPressed: () => Navigator.of(context).pop(),
           ),
-          brightness: Brightness.light,
           actions: <Widget>[
             IconButton(
                 icon: const Icon(
@@ -416,7 +419,7 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
                   color: Color(0xFF3a3737),
                 ),
                 onPressed: () {
-                  Navigator.push(context, ScaleRoute(page: FoodOrderPage()));
+                  Navigator.push(context, ScaleRoute(page: const FoodOrderPage()));
                 })
           ],
         ),
@@ -502,8 +505,13 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
 }
 
 class _BookingTitle extends StatelessWidget {
-  const _BookingTitle({Key key, this.title, this.price, this.businessName, this.duration})
-      : super(key: key);
+  const _BookingTitle({
+    super.key,
+    required this.title,
+    required this.price,
+    required this.businessName,
+    required this.duration,
+  });
 
   final String title;
   final String price;
@@ -512,7 +520,7 @@ class _BookingTitle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations localizations = AppLocalizations.of(context);
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -520,14 +528,14 @@ class _BookingTitle extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
-              title ?? '',
+              title,
               style: const TextStyle(
                   fontSize: 20,
                   color: Color(0xFF3a3a3b),
                   fontWeight: FontWeight.w500),
             ),
             Text(
-              price ?? '',
+              price,
               style: const TextStyle(
                   fontSize: 20,
                   color: Color(0xFF3a3a3b),
@@ -535,11 +543,9 @@ class _BookingTitle extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(
-          height: 5,
-        ),
+        const SizedBox(height: 5),
         Text(
-          businessName ?? '',
+          businessName,
           style: const TextStyle(
               fontSize: 16,
               color: Color(0xFFa9a9a9),
@@ -547,7 +553,7 @@ class _BookingTitle extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         Text(
-          localizations.translate('service.duration.minutes', count: duration ?? 0),
+          localizations.translate('service.duration.minutes', count: duration),
           style: const TextStyle(
               fontSize: 14,
               color: Color(0xFF6e6e71),
@@ -559,10 +565,10 @@ class _BookingTitle extends StatelessWidget {
 }
 
 class _BookingCard extends StatelessWidget {
-  const _BookingCard({Key key, this.title, this.subtitle, this.child}) : super(key: key);
+  const _BookingCard({super.key, required this.title, this.subtitle, required this.child});
 
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final Widget child;
 
   @override
@@ -581,7 +587,7 @@ class _BookingCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                title ?? '',
+                title,
                 style: const TextStyle(
                     fontSize: 16,
                     color: Color(0xFF3a3a3b),
@@ -590,7 +596,7 @@ class _BookingCard extends StatelessWidget {
               if (subtitle != null) ...<Widget>[
                 const SizedBox(height: 4),
                 Text(
-                  subtitle,
+                  subtitle!,
                   style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFF6e6e71),
@@ -609,16 +615,16 @@ class _BookingCard extends StatelessWidget {
 
 // Legacy widgets retained for food ordering mode
 class FoodTitleWidget extends StatelessWidget {
-  String productName;
-  String productPrice;
-  String productHost;
+  const FoodTitleWidget({
+    super.key,
+    required this.productName,
+    required this.productPrice,
+    required this.productHost,
+  });
 
-  FoodTitleWidget({
-    Key key,
-    @required this.productName,
-    @required this.productPrice,
-    @required this.productHost,
-  }) : super(key: key);
+  final String productName;
+  final String productPrice;
+  final String productHost;
 
   @override
   Widget build(BuildContext context) {

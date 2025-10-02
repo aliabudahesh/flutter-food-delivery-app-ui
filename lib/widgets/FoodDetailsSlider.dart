@@ -1,49 +1,44 @@
-import 'package:carousel_pro/carousel_pro.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class FoodDetailsSlider extends StatelessWidget {
-  String slideImage1;
-  String slideImage2;
-  String slideImage3;
+  const FoodDetailsSlider({super.key, required this.slideImage1, this.slideImage2, this.slideImage3});
 
-  FoodDetailsSlider(
-      {Key key,
-      @required this.slideImage1,
-      @required this.slideImage2,
-      @required this.slideImage3})
-      : super(key: key);
+  final String slideImage1;
+  final String? slideImage2;
+  final String? slideImage3;
+
+  List<Widget> _buildSlides() {
+    final List<String> images = <String>[slideImage1];
+    if (slideImage2 != null) {
+      images.add(slideImage2!);
+    }
+    if (slideImage3 != null) {
+      images.add(slideImage3!);
+    }
+    return images
+        .map((String assetPath) => ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
+              child: Image.asset(assetPath, fit: BoxFit.cover, width: double.infinity),
+            ))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> slides = _buildSlides();
     return Padding(
-      padding: EdgeInsets.only(left: 10, right: 10),
-      child: Container(
-          child: Carousel(
-            images: [
-              Image.asset(
-                slideImage1,
-              ),
-              /* Image.asset(
-                slideImage2,
-                height: double.infinity,
-                width: double.infinity,
-              ),
-              Image.asset(
-                slideImage3,
-                height: double.infinity,
-                width: double.infinity,
-              ),*/
-            ],
-            dotSize: 4.0,
-            dotSpacing: 15.0,
-            dotColor: Colors.purple,
-            indicatorBgPadding: 5.0,
-            dotBgColor: Colors.black54.withOpacity(0),
-            borderRadius: true,
-            radius: Radius.circular(20),
-            moveIndicatorFromBottom: 180.0,
-            noRadiusForIndicator: true,
-          )),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: CarouselSlider(
+        items: slides,
+        options: CarouselOptions(
+          height: 220,
+          viewportFraction: 1,
+          enableInfiniteScroll: slides.length > 1,
+          autoPlay: slides.length > 1,
+          enlargeCenterPage: false,
+        ),
+      ),
     );
   }
 }

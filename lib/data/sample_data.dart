@@ -6,31 +6,31 @@ import 'package:flutter_app/models/service.dart';
 import 'package:flutter_app/models/staff.dart';
 
 class TopMenuItemData {
-  final String labelKey;
-  final String assetPath;
-  final IconData iconData;
-
   const TopMenuItemData({
-    this.labelKey,
+    required this.labelKey,
     this.assetPath,
     this.iconData,
   });
+
+  final String labelKey;
+  final String? assetPath;
+  final IconData? iconData;
 }
 
 class RecommendedItem {
-  final String titleKey;
-  final String subtitleKey;
-  final double price;
-  final int duration;
-  final String imageAsset;
-
   const RecommendedItem({
-    this.titleKey,
-    this.subtitleKey,
+    required this.titleKey,
+    required this.subtitleKey,
+    required this.imageAsset,
     this.price = 0,
     this.duration = 0,
-    this.imageAsset,
   });
+
+  final String titleKey;
+  final String subtitleKey;
+  final String imageAsset;
+  final double price;
+  final int duration;
 }
 
 class SampleData {
@@ -248,6 +248,7 @@ class SampleData {
     return <Booking>[
       Booking(
         id: 'bk_1',
+        userId: 'demo-user',
         businessId: 'biz_1',
         branchId: 'loc_1',
         serviceId: 'svc_1',
@@ -255,9 +256,12 @@ class SampleData {
         start: DateTime(_today.year, _today.month, _today.day, 11, 0),
         end: DateTime(_today.year, _today.month, _today.day, 11, 45),
         price: 120,
+        createdAt: DateTime(_today.year, _today.month, _today.day, 9),
+        status: BookingStatus.confirmed,
       ),
       Booking(
         id: 'bk_2',
+        userId: 'demo-user',
         businessId: 'biz_1',
         branchId: 'loc_1',
         serviceId: 'svc_2',
@@ -265,6 +269,8 @@ class SampleData {
         start: DateTime(_today.year, _today.month, _today.day + 1, 14, 0),
         end: DateTime(_today.year, _today.month, _today.day + 1, 15, 15),
         price: 180,
+        createdAt: DateTime(_today.year, _today.month, _today.day + 1, 10),
+        status: BookingStatus.pending,
       ),
     ];
   }

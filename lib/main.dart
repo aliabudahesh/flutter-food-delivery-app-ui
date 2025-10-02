@@ -6,9 +6,11 @@ import 'package:flutter_app/pages/HomePage.dart';
 import 'package:flutter_app/pages/SignInPage.dart';
 import 'package:flutter_app/pages/SignUpPage.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,21 +23,19 @@ class MyApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      builder: (BuildContext context, Widget child) {
-        final AppLocalizations localizations = AppLocalizations.of(context);
+      builder: (BuildContext context, Widget? child) {
+        final AppLocalizations? localizations = AppLocalizations.of(context);
         return Directionality(
           textDirection: localizations?.textDirection ?? TextDirection.ltr,
-          child: child,
+          child: child ?? const SizedBox.shrink(),
         );
       },
       theme: ThemeData(fontFamily: 'Roboto', hintColor: const Color(0xFFd0cece)),
-      title: AppConfig.isBookingMode
-          ? 'Business Booking'
-          : 'Food Delivery',
-      home: HomePage(),
+      title: AppConfig.isBookingMode ? 'Business Booking' : 'Food Delivery',
+      home: const HomePage(),
       routes: <String, WidgetBuilder>{
-        '/signin': (BuildContext context) => SignInPage(),
-        '/signup': (BuildContext context) => SignUpPage(),
+        '/signin': (BuildContext context) => const SignInPage(),
+        '/signup': (BuildContext context) => const SignUpPage(),
       },
     );
   }

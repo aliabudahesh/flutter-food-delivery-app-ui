@@ -4,14 +4,14 @@ import 'package:flutter_app/data/sample_data.dart';
 import 'package:flutter_app/l10n/app_localizations.dart';
 
 class PopularFoodsWidget extends StatelessWidget {
-  const PopularFoodsWidget({Key key, this.items, this.onTap}) : super(key: key);
+  const PopularFoodsWidget({super.key, this.items, this.onTap});
 
-  final List<RecommendedItem> items;
-  final ValueChanged<RecommendedItem> onTap;
+  final List<RecommendedItem>? items;
+  final ValueChanged<RecommendedItem>? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 265,
       width: double.infinity,
       child: Column(
@@ -22,19 +22,15 @@ class PopularFoodsWidget extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemCount: items?.length ?? 0,
               itemBuilder: (BuildContext context, int index) {
-                final RecommendedItem item = items[index];
+                final RecommendedItem item = items![index];
+                final AppLocalizations localizations = AppLocalizations.of(context)!;
                 return PopularFoodTile(
-                  title: AppLocalizations.of(context).translate(item.titleKey),
-                  subtitle:
-                      AppLocalizations.of(context).translate(item.subtitleKey),
+                  title: localizations.translate(item.titleKey),
+                  subtitle: localizations.translate(item.subtitleKey),
                   price: item.price,
                   duration: item.duration,
                   imageAsset: item.imageAsset,
-                  onTap: () {
-                    if (onTap != null) {
-                      onTap(item);
-                    }
-                  },
+                  onTap: onTap == null ? null : () => onTap!(item),
                 );
               },
             ),
@@ -46,11 +42,11 @@ class PopularFoodsWidget extends StatelessWidget {
 }
 
 class PopularFoodTitle extends StatelessWidget {
-  const PopularFoodTitle({Key key}) : super(key: key);
+  const PopularFoodTitle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations localizations = AppLocalizations.of(context);
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
     final String titleKey = AppConfig.isBookingMode
         ? 'home.section.recommended.booking'
         : 'home.section.recommended.food';
@@ -74,25 +70,25 @@ class PopularFoodTitle extends StatelessWidget {
 
 class PopularFoodTile extends StatelessWidget {
   const PopularFoodTile({
-    Key key,
-    this.title,
-    this.subtitle,
-    this.price,
-    this.duration,
-    this.imageAsset,
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.price,
+    required this.duration,
+    required this.imageAsset,
     this.onTap,
-  }) : super(key: key);
+  });
 
   final String title;
   final String subtitle;
   final double price;
   final int duration;
   final String imageAsset;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations localizations = AppLocalizations.of(context);
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
     return InkWell(
       onTap: onTap,
       child: Column(
@@ -219,8 +215,8 @@ class PopularFoodTile extends StatelessWidget {
                                 const EdgeInsets.only(left: 5, top: 5, right: 5),
                             child: Text(
                               AppConfig.isBookingMode
-                                  ? '${price?.toStringAsFixed(0) ?? '0'} ₪'
-                                  : '\$${price?.toStringAsFixed(2) ?? '0.00'}',
+                                  ? '${price.toStringAsFixed(0)} ₪'
+                                  : '\$${price.toStringAsFixed(2)}',
                               style: const TextStyle(
                                   color: Color(0xFF6e6e71),
                                   fontSize: 15,
@@ -235,7 +231,7 @@ class PopularFoodTile extends StatelessWidget {
                           padding: const EdgeInsets.only(left: 5, top: 5, right: 5),
                           child: Text(
                             localizations.translate('service.duration.minutes',
-                                count: duration ?? AppConfig.slotLengthMinutes),
+                                count: duration),
                             style: const TextStyle(
                                 color: Color(0xFF6e6e71),
                                 fontSize: 10,
