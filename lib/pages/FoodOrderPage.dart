@@ -31,7 +31,9 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
     final Business business = draft.business!;
     final Service service = draft.service!;
     final BusinessLocation branch = draft.branch ??
-        (business.locations.isNotEmpty ? business.locations.first : BusinessLocation(id: 'default', name: service.name));
+        (business.locations.isNotEmpty
+            ? business.locations.first
+            : BusinessLocation(id: 'default', name: service.name));
 
     return Scaffold(
       appBar: AppBar(
@@ -103,7 +105,8 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
                   message: localizations.translate('booking.summary.completed'),
                 ),
               const SizedBox(height: 10),
-              _buildActionButtons(localizations, draft, business: business, branch: branch, service: service),
+              _buildActionButtons(localizations, draft,
+                  business: business, branch: branch, service: service),
             ],
           ),
         ),
@@ -112,18 +115,22 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
   }
 
   Widget _buildActionButtons(AppLocalizations localizations, BookingDraft draft,
-      {required Business business, required BusinessLocation branch, required Service service}) {
+      {required Business business,
+      required BusinessLocation branch,
+      required Service service}) {
     final StaffMember? staff = draft.staff;
     final DateTime start = draft.start!;
     return Column(
       children: <Widget>[
         SizedBox(
           width: double.infinity,
-          child: RaisedButton(
-            color: const Color(0xFFfb3132),
-            textColor: Colors.white,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFfb3132), // replaces color:
+                foregroundColor: Colors.white, // replaces textColor:
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                )),
             onPressed: () {
               _repository.createBooking(
                 business: business,
@@ -136,10 +143,11 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
               setState(() {
                 _bookingConfirmed = true;
               });
-              debugPrint('[analytics] booking_confirmed:${service.id}:${start.toIso8601String()}');
+              debugPrint(
+                  '[analytics] booking_confirmed:${service.id}:${start.toIso8601String()}');
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text(
-                    localizations.translate('booking.summary.success')),
+                content:
+                    Text(localizations.translate('booking.summary.success')),
               ));
             },
             child: Text(localizations.translate('booking.button.confirm')),
@@ -148,19 +156,23 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
         const SizedBox(height: 10),
         SizedBox(
           width: double.infinity,
-          child: OutlineButton(
-            borderSide: const BorderSide(color: Color(0xFFfb3132)),
-            textColor: const Color(0xFFfb3132),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              side:
+                  const BorderSide(color: Color(0xFFfb3132)), // was borderSide:
+              foregroundColor: const Color(0xFFfb3132), // was textColor:
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
             onPressed: () {
               final String ics = _generateIcsContent(draft);
               showDialog<void>(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text(
-                        localizations.translate('booking.summary.add_to_calendar')),
+                    title: Text(localizations
+                        .translate('booking.summary.add_to_calendar')),
                     content: SingleChildScrollView(
                       child: SelectableText(ics),
                     ),
@@ -177,7 +189,8 @@ class _FoodOrderPageState extends State<FoodOrderPage> {
                 content: Text(localizations.translate('booking.alert.added')),
               ));
             },
-            child: Text(localizations.translate('booking.summary.add_to_calendar')),
+            child: Text(
+                localizations.translate('booking.summary.add_to_calendar')),
           ),
         ),
       ],
@@ -351,7 +364,7 @@ class _SummaryCard extends StatelessWidget {
               if (subtitle != null) ...<Widget>[
                 const SizedBox(height: 2),
                 Text(
-                  subtitle,
+                  subtitle ?? '',
                   style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFFa4a1a1),
@@ -388,8 +401,7 @@ class _SuccessBanner extends StatelessWidget {
             child: Text(
               message ?? '',
               style: const TextStyle(
-                  color: Color(0xFF2e7d32),
-                  fontWeight: FontWeight.w500),
+                  color: Color(0xFF2e7d32), fontWeight: FontWeight.w500),
             ),
           ),
         ],

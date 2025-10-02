@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
                       context,
                       RecommendedItem(
                         titleKey: service.name,
-                        subtitleKey: business.description,
+                        subtitleKey: business.description ?? '',
                         price: service.price,
                         duration: service.durationMinutes,
                         imageAsset: business.photos.isNotEmpty

@@ -3,7 +3,7 @@ class ScheduleDay {
   final List<DateTime> availableSlots;
 
   const ScheduleDay({
-    this.date,
+    required this.date,
     this.availableSlots = const <DateTime>[],
   });
 }

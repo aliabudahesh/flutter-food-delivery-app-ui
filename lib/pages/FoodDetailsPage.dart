@@ -41,7 +41,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
 
   void _initializeBookingContext() {
     final List<Business> businesses = _repository.getBusinesses();
-    _business = widget.business ?? (businesses.isNotEmpty ? businesses.first : null);
+    _business =
+        widget.business ?? (businesses.isNotEmpty ? businesses.first : null);
     final Business? business = _business;
     if (business == null) {
       return;
@@ -53,7 +54,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
     _selectedBranch =
         business.locations.isNotEmpty ? business.locations.first : null;
     if (AppConfig.allowStaffSelection) {
-      final List<StaffMember> staff = _repository.getStaffForBusiness(business.id);
+      final List<StaffMember> staff =
+          _repository.getStaffForBusiness(business.id);
       _selectedStaff = staff.isNotEmpty ? staff.first : null;
     }
     _refreshSlots();
@@ -84,8 +86,9 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
     });
   }
 
-  List<StaffMember> get _availableStaff =>
-      _business == null ? <StaffMember>[] : _repository.getStaffForBusiness(_business!.id);
+  List<StaffMember> get _availableStaff => _business == null
+      ? <StaffMember>[]
+      : _repository.getStaffForBusiness(_business!.id);
 
   @override
   Widget build(BuildContext context) {
@@ -96,9 +99,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
     final AppLocalizations localizations = AppLocalizations.of(context)!;
     final String serviceName =
         _service != null ? localizations.translate(_service!.name) : '';
-    final String businessName = _business != null
-        ? localizations.translate(_business!.name)
-        : '';
+    final String businessName =
+        _business != null ? localizations.translate(_business!.name) : '';
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -127,11 +129,12 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
             const SizedBox(height: 10),
             _BookingTitle(
               title: serviceName,
-              price: _service != null
-                  ? '${_service.price.toStringAsFixed(0)} ₪'
+              price: _service?.price != null
+                  ? '${_service!.price.toStringAsFixed(0)} ₪'
                   : '',
               businessName: businessName,
-              duration: _service?.durationMinutes ?? AppConfig.slotLengthMinutes,
+              duration:
+                  _service?.durationMinutes ?? AppConfig.slotLengthMinutes,
             ),
             const SizedBox(height: 10),
             _buildDescriptionCard(localizations),
@@ -207,7 +210,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
   }
 
   Widget _buildBranchSelector(AppLocalizations localizations) {
-    final List<BusinessLocation> locations = _business?.locations ?? <BusinessLocation>[];
+    final List<BusinessLocation> locations =
+        _business?.locations ?? <BusinessLocation>[];
     final List<BusinessLocation> filteredLocations =
         _service != null && _service!.branches.isNotEmpty
             ? locations
@@ -238,7 +242,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
           _refreshSlots();
         },
         items: filteredLocations
-            .map((BusinessLocation location) => DropdownMenuItem<BusinessLocation>(
+            .map((BusinessLocation location) =>
+                DropdownMenuItem<BusinessLocation>(
                   value: location,
                   child: Text(localizations.translate(location.name)),
                 ))
@@ -325,8 +330,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
         runSpacing: 8,
         children: _slots
             .map((DateTime slot) => ChoiceChip(
-                  label: Text(materialLocalizations.formatTimeOfDay(
-                      TimeOfDay.fromDateTime(slot))),
+                  label: Text(materialLocalizations
+                      .formatTimeOfDay(TimeOfDay.fromDateTime(slot))),
                   selected: _selectedSlot == slot,
                   onSelected: (bool selected) {
                     setState(() {
@@ -361,37 +366,41 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
   Widget _buildContinueButton(AppLocalizations localizations) {
     return SizedBox(
       width: double.infinity,
-      child: RaisedButton(
-        color: const Color(0xFFfb3132),
-        textColor: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        onPressed: _selectedSlot == null || _service == null || _business == null
-            ? () {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content:
-                      Text(localizations.translate('booking.alert.unavailable')),
-                ));
-              }
-            : () {
-                debugPrint('[analytics] select_service:${_service!.id}');
-                debugPrint('[analytics] select_slot:${_selectedSlot!.toIso8601String()}');
-                final BookingDraft draft = BookingDraft(
-                  business: _business,
-                  branch: _selectedBranch,
-                  service: _service,
-                  staff: _selectedStaff,
-                  start: _selectedSlot,
-                  notes: _notesController.text,
-                );
-                Navigator.push(
-                  context,
-                  ScaleRoute(
-                    page: FoodOrderPage(
-                      bookingDraft: draft,
-                    ),
-                  ),
-                );
-              },
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFfb3132),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed:
+            _selectedSlot == null || _service == null || _business == null
+                ? () {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          localizations.translate('booking.alert.unavailable')),
+                    ));
+                  }
+                : () {
+                    debugPrint('[analytics] select_service:${_service!.id}');
+                    debugPrint(
+                        '[analytics] select_slot:${_selectedSlot!.toIso8601String()}');
+                    final BookingDraft draft = BookingDraft(
+                      business: _business,
+                      branch: _selectedBranch,
+                      service: _service,
+                      staff: _selectedStaff,
+                      start: _selectedSlot,
+                      notes: _notesController.text,
+                    );
+                    Navigator.push(
+                      context,
+                      ScaleRoute(
+                        page: FoodOrderPage(
+                          bookingDraft: draft,
+                        ),
+                      ),
+                    );
+                  },
         child: Text(localizations.translate('booking.button.review')),
       ),
     );
@@ -419,7 +428,8 @@ class _FoodDetailsPageState extends State<FoodDetailsPage> {
                   color: Color(0xFF3a3737),
                 ),
                 onPressed: () {
-                  Navigator.push(context, ScaleRoute(page: const FoodOrderPage()));
+                  Navigator.push(
+                      context, ScaleRoute(page: const FoodOrderPage()));
                 })
           ],
         ),
@@ -565,7 +575,8 @@ class _BookingTitle extends StatelessWidget {
 }
 
 class _BookingCard extends StatelessWidget {
-  const _BookingCard({super.key, required this.title, this.subtitle, required this.child});
+  const _BookingCard(
+      {super.key, required this.title, this.subtitle, required this.child});
 
   final String title;
   final String? subtitle;
