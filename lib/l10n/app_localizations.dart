@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class AppLocalizations {
@@ -317,14 +318,14 @@ class AppLocalizations {
     },
   };
 
-  static AppLocalizations of(BuildContext context) {
+  static AppLocalizations? of(BuildContext context) {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  String translate(String key, {int count}) {
-    final Map<String, String> values =
-        _localizedValues[locale.languageCode] ?? _localizedValues['en'];
-    String result = values[key] ?? _localizedValues['en'][key] ?? key;
+  String translate(String key, {int? count}) {
+    final Map<String, String>? values = _localizedValues[locale.languageCode];
+    final Map<String, String> fallback = _localizedValues['en']!;
+    String result = (values != null ? values[key] : null) ?? fallback[key] ?? key;
     if (count != null) {
       result = result.replaceAll('%d', '$count');
     }
@@ -351,7 +352,7 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   Future<AppLocalizations> load(Locale locale) async {
-    return AppLocalizations(locale);
+    return SynchronousFuture<AppLocalizations>(AppLocalizations(locale));
   }
 
   @override

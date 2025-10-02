@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class SearchWidget extends StatelessWidget {
-  const SearchWidget({Key key, this.hintText}) : super(key: key);
+  const SearchWidget({super.key, this.hintText});
 
-  final String hintText;
+  final String? hintText;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 10,top: 5,right: 10,bottom: 5),
+      padding: const EdgeInsets.only(left: 10, top: 5, right: 10, bottom: 5),
       child: TextField(
 
         decoration: InputDecoration(
@@ -21,14 +21,14 @@ class SearchWidget extends StatelessWidget {
             ),
           ),
           filled: true,
-          prefixIcon: Icon(
+          prefixIcon: const Icon(
             Icons.search,
             color: Color(0xFFfb3132),
           ),
-          fillColor: Color(0xFFFAFAFA),
-          suffixIcon: Icon(Icons.sort,color: Color(0xFFfb3132),),
-          hintStyle: new TextStyle(color: Color(0xFFd0cece), fontSize: 18),
-          hintText: hintText ?? "",
+          fillColor: const Color(0xFFFAFAFA),
+          suffixIcon: const Icon(Icons.sort, color: Color(0xFFfb3132)),
+          hintStyle: const TextStyle(color: Color(0xFFd0cece), fontSize: 18),
+          hintText: hintText ?? '',
         ),
       ),
     );

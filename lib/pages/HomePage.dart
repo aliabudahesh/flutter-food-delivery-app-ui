@@ -15,15 +15,18 @@ import 'package:flutter_app/widgets/SearchWidget.dart';
 import 'package:flutter_app/widgets/TopMenus.dart';
 
 class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
+
 class _HomePageState extends State<HomePage> {
   final BookingRepository _repository = BookingRepository();
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations localizations = AppLocalizations.of(context);
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
     final String title = AppConfig.isBookingMode
         ? localizations.translate('home.title.booking')
         : localizations.translate('home.title.food');
@@ -34,24 +37,23 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFFAFAFA),
+        backgroundColor: const Color(0xFFFAFAFA),
         elevation: 0,
         title: Text(
           title,
-          style: TextStyle(
+          style: const TextStyle(
               color: Color(0xFF3a3737),
               fontSize: 16,
               fontWeight: FontWeight.w500),
         ),
-        brightness: Brightness.light,
         actions: <Widget>[
           IconButton(
-              icon: Icon(
+              icon: const Icon(
                 Icons.notifications_none,
                 color: Color(0xFF3a3737),
               ),
               onPressed: () {
-                Navigator.push(context, ScaleRoute(page: SignInPage()));
+                Navigator.push(context, ScaleRoute(page: const SignInPage()));
               })
         ],
       ),
@@ -71,7 +73,7 @@ class _HomePageState extends State<HomePage> {
                   _openBookingDetails(context, item);
                 } else {
                   Navigator.push(
-                      context, ScaleRoute(page: FoodDetailsPage()));
+                      context, ScaleRoute(page: const FoodDetailsPage()));
                 }
               },
             ),
@@ -99,35 +101,45 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavBarWidget(),
+      bottomNavigationBar: const BottomNavBarWidget(),
     );
   }
 
   void _openBookingDetails(BuildContext context, RecommendedItem item) {
     final List<Business> businesses = _repository.getBusinesses();
-    final Business business = businesses.firstWhere(
-      (Business b) =>
-          b.services.any((Service service) => service.name == item.titleKey),
-      orElse: () => businesses.isNotEmpty ? businesses.first : null,
-    );
-    if (business == null) {
+    if (businesses.isEmpty) {
       return;
     }
 
-    final Service service = _repository
-        .getServicesForBusiness(business.id)
-        .firstWhere((Service s) => s.name == item.titleKey,
-            orElse: () => _repository.getServicesForBusiness(business.id).first);
+    Business? selectedBusiness;
+    for (final Business candidate in businesses) {
+      if (candidate.services.any((Service service) => service.name == item.titleKey)) {
+        selectedBusiness = candidate;
+        break;
+      }
+    }
+    selectedBusiness ??= businesses.first;
+
+    final List<Service> services =
+        _repository.getServicesForBusiness(selectedBusiness.id);
+    if (services.isEmpty) {
+      return;
+    }
+
+    final Service service = services.firstWhere(
+      (Service s) => s.name == item.titleKey,
+      orElse: () => services.first,
+    );
 
     Navigator.push(
       context,
       ScaleRoute(
         page: FoodDetailsPage(
-          business: business,
+          business: selectedBusiness,
           service: service,
         ),
       ),
     );
-    debugPrint('[analytics] ${AppConfig.isBookingMode ? 'view_business' : 'view_food'}:${business.id}:${service.id}');
+    debugPrint('[analytics] ${AppConfig.isBookingMode ? 'view_business' : 'view_food'}:${selectedBusiness.id}:${service.id}');
   }
 }

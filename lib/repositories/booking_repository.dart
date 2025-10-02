@@ -62,7 +62,7 @@ class BookingRepository {
         .toList();
   }
 
-  List<Booking> getExistingBookings(String businessId, {String staffId}) {
+  List<Booking> getExistingBookings(String businessId, {String? staffId}) {
     return SampleData.getExistingBookings().where((Booking booking) {
       if (booking.businessId != businessId) {
         return false;
@@ -75,11 +75,11 @@ class BookingRepository {
   }
 
   List<DateTime> generateSlots({
-    DateTime forDate,
-    Service service,
-    StaffMember staff,
-    Business business,
-    BusinessLocation branch,
+    DateTime? forDate,
+    Service? service,
+    StaffMember? staff,
+    Business? business,
+    BusinessLocation? branch,
   }) {
     if (!AppConfig.isBookingMode || service == null || business == null) {
       return const <DateTime>[];
@@ -124,24 +124,20 @@ class BookingRepository {
   }
 
   Booking createBooking({
-    String userId,
-    Business business,
-    BusinessLocation branch,
-    Service service,
-    StaffMember staff,
-    DateTime start,
-    String notes,
+    String? userId,
+    required Business business,
+    BusinessLocation? branch,
+    required Service service,
+    StaffMember? staff,
+    required DateTime start,
+    String? notes,
   }) {
-    if (!AppConfig.isBookingMode || business == null || service == null || start == null) {
-      throw ArgumentError('Invalid booking parameters');
-    }
-
     final DateTime end = start.add(Duration(minutes: service.durationMinutes));
     final Booking booking = Booking(
       id: 'bk_${DateTime.now().millisecondsSinceEpoch}',
       userId: userId ?? 'demo-user',
       businessId: business.id,
-      branchId: branch?.id ?? business.locations.first.id,
+      branchId: branch?.id ?? (business.locations.isNotEmpty ? business.locations.first.id : ''),
       serviceId: service.id,
       staffId: staff?.id,
       start: start,

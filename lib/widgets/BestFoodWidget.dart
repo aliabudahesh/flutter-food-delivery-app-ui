@@ -4,14 +4,14 @@ import 'package:flutter_app/l10n/app_localizations.dart';
 import 'package:flutter_app/models/business.dart';
 
 class BestFoodWidget extends StatelessWidget {
-  const BestFoodWidget({Key key, this.businesses, this.onTap}) : super(key: key);
+  const BestFoodWidget({super.key, this.businesses, this.onTap});
 
-  final List<Business> businesses;
-  final ValueChanged<Business> onTap;
+  final List<Business>? businesses;
+  final ValueChanged<Business>? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 400,
       width: double.infinity,
       child: Column(
@@ -22,7 +22,7 @@ class BestFoodWidget extends StatelessWidget {
               businesses: businesses,
               onTap: onTap,
             ),
-          )
+          ),
         ],
       ),
     );
@@ -30,14 +30,13 @@ class BestFoodWidget extends StatelessWidget {
 }
 
 class BestFoodTitle extends StatelessWidget {
-  const BestFoodTitle({Key key}) : super(key: key);
+  const BestFoodTitle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations localizations = AppLocalizations.of(context);
-    final String titleKey = AppConfig.isBookingMode
-        ? 'home.section.best.booking'
-        : 'home.section.best.food';
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
+    final String titleKey =
+        AppConfig.isBookingMode ? 'home.section.best.booking' : 'home.section.best.food';
     return Container(
       padding: const EdgeInsets.only(left: 10, right: 10, top: 5, bottom: 5),
       child: Row(
@@ -46,9 +45,10 @@ class BestFoodTitle extends StatelessWidget {
           Text(
             localizations.translate(titleKey),
             style: const TextStyle(
-                fontSize: 20,
-                color: Color(0xFF3a3a3b),
-                fontWeight: FontWeight.w300),
+              fontSize: 20,
+              color: Color(0xFF3a3a3b),
+              fontWeight: FontWeight.w300,
+            ),
           ),
         ],
       ),
@@ -58,27 +58,27 @@ class BestFoodTitle extends StatelessWidget {
 
 class BestFoodTiles extends StatelessWidget {
   const BestFoodTiles({
-    Key key,
-    this.business,
-    this.imageUrl,
+    super.key,
+    required this.business,
+    required this.imageUrl,
     this.onTap,
-  }) : super(key: key);
+  });
 
   final Business business;
   final String imageUrl;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    final AppLocalizations localizations = AppLocalizations.of(context);
+    final AppLocalizations localizations = AppLocalizations.of(context)!;
     final String title = AppConfig.isBookingMode
-        ? localizations.translate(business.name ?? '')
-        : business.name ?? '';
+        ? localizations.translate(business.name)
+        : business.name;
     final String subtitle = AppConfig.isBookingMode
         ? localizations.translate(business.description ?? '')
-        : business.description ?? '';
+        : (business.description ?? '');
     final String ratingLabel = AppConfig.isBookingMode
-        ? '${business.rating.toStringAsFixed(1)} · ${business.ratingCount}‎'
+        ? '${business.rating.toStringAsFixed(1)} · ${business.ratingCount}'
         : '${business.rating.toStringAsFixed(1)} (${business.ratingCount})';
 
     return InkWell(
@@ -117,9 +117,10 @@ class BestFoodTiles extends StatelessWidget {
                 Text(
                   title,
                   style: const TextStyle(
-                      color: Color(0xFF3a3a3b),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
+                    color: Color(0xFF3a3a3b),
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -127,17 +128,19 @@ class BestFoodTiles extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                      color: Color(0xFF6e6e71),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400),
+                    color: Color(0xFF6e6e71),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   ratingLabel,
                   style: const TextStyle(
-                      color: Color(0xFF6e6e71),
-                      fontSize: 12,
-                      fontWeight: FontWeight.w400),
+                    color: Color(0xFF6e6e71),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ],
             ),
@@ -149,29 +152,26 @@ class BestFoodTiles extends StatelessWidget {
 }
 
 class BestFoodList extends StatelessWidget {
-  const BestFoodList({Key key, this.businesses, this.onTap}) : super(key: key);
+  const BestFoodList({super.key, this.businesses, this.onTap});
 
-  final List<Business> businesses;
-  final ValueChanged<Business> onTap;
+  final List<Business>? businesses;
+  final ValueChanged<Business>? onTap;
 
   @override
   Widget build(BuildContext context) {
     if (AppConfig.isBookingMode) {
+      final List<Business> items = businesses ?? const <Business>[];
       return ListView.builder(
-        itemCount: businesses?.length ?? 0,
+        itemCount: items.length,
         itemBuilder: (BuildContext context, int index) {
-          final Business business = businesses[index];
+          final Business business = items[index];
           final String image = business.photos.isNotEmpty
               ? business.photos.first
               : 'assets/images/bestfood/ic_best_food_8.jpeg';
           return BestFoodTiles(
             business: business,
             imageUrl: image,
-            onTap: () {
-              if (onTap != null) {
-                onTap(business);
-              }
-            },
+            onTap: onTap == null ? null : () => onTap!(business),
           );
         },
       );
@@ -179,34 +179,46 @@ class BestFoodList extends StatelessWidget {
 
     return ListView(
       children: const <Widget>[
-        const BestFoodTiles(
-            business: const Business(
-                name: 'Fried Egg',
-                description: 'Classic breakfast with veggies',
-                rating: 4.9,
-                ratingCount: 200),
-            imageUrl: 'assets/images/bestfood/ic_best_food_8.jpeg'),
-        const BestFoodTiles(
-            business: const Business(
-                name: 'Mixed vegetable',
-                description: 'Healthy mix of greens',
-                rating: 4.9,
-                ratingCount: 100),
-            imageUrl: 'assets/images/bestfood/ic_best_food_9.jpeg'),
-        const BestFoodTiles(
-            business: const Business(
-                name: 'Salad with chicken meat',
-                description: 'Fresh salad with grilled chicken',
-                rating: 4.0,
-                ratingCount: 50),
-            imageUrl: 'assets/images/bestfood/ic_best_food_10.jpeg'),
-        const BestFoodTiles(
-            business: const Business(
-                name: 'New mixed salad',
-                description: 'Crunchy salad bowl',
-                rating: 4.0,
-                ratingCount: 100),
-            imageUrl: 'assets/images/bestfood/ic_best_food_5.jpeg'),
+        BestFoodTiles(
+          business: Business(
+            id: 'food_fried_egg',
+            name: 'Fried Egg',
+            description: 'Classic breakfast with veggies',
+            rating: 4.9,
+            ratingCount: 200,
+          ),
+          imageUrl: 'assets/images/bestfood/ic_best_food_8.jpeg',
+        ),
+        BestFoodTiles(
+          business: Business(
+            id: 'food_mixed_vegetable',
+            name: 'Mixed vegetable',
+            description: 'Healthy mix of greens',
+            rating: 4.9,
+            ratingCount: 100,
+          ),
+          imageUrl: 'assets/images/bestfood/ic_best_food_9.jpeg',
+        ),
+        BestFoodTiles(
+          business: Business(
+            id: 'food_salad_chicken',
+            name: 'Salad with chicken meat',
+            description: 'Fresh salad with grilled chicken',
+            rating: 4.0,
+            ratingCount: 50,
+          ),
+          imageUrl: 'assets/images/bestfood/ic_best_food_10.jpeg',
+        ),
+        BestFoodTiles(
+          business: Business(
+            id: 'food_new_mixed_salad',
+            name: 'New mixed salad',
+            description: 'Crunchy salad bowl',
+            rating: 4.0,
+            ratingCount: 100,
+          ),
+          imageUrl: 'assets/images/bestfood/ic_best_food_5.jpeg',
+        ),
       ],
     );
   }
